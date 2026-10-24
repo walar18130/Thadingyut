@@ -256,6 +256,29 @@ function populateSky(){
   for(let i=0;i<total;i++) addLantern(wishes[i%wishes.length],true);
 }
 
+  
+async function handleWishSubmit() {
+    const wishInput = document.getElementById('wishForm');
+    const colorPicker = document.getElementById('colors');
+
+    try {
+        await saveWish(wishInput.value, colorPicker.value);
+        wishInput.value = '';
+
+        alert('Wish တင်ပြီးပါပြီ။');
+        await renderWishes();
+    } catch (error) {
+        alert(error.message || 'Wish တင်မရပါ။');
+    }
+}
+
+async function renderWishes() {
+    const wishes = await getWishes();
+
+    // Connect this array to your existing lantern-rendering code.
+    console.log(wishes);
+}
+
 // Color picker
 document.getElementById("colors").addEventListener("click",e=>{
   const btn=e.target.closest("[data-color]");
@@ -307,6 +330,104 @@ for(let i=0;i<120;i++){
   sky.appendChild(s);
 }
 populateSky();
+</script>
+  <!-- Add before </body> -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = 'kthkrdkdqmossoynumxe';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0aGtyZGtkcW1vc3NveW51bXhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4NDMxNzQsImV4cCI6MjEwODQxOTE3NH0.wiLgyCYfgTyP_dwOxE20zeix8hAego-wEeMfzrKp2fk';
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+// Submit a wish
+async function saveWish(wishText, lanternColor) {
+    const text = wishText.trim();
+
+    if (!text || text.length > 500) {
+        throw new Error('Wish ကို 1 မှ 500 characters အတွင်း ဖြည့်ပါ။');
+    }
+
+    const allowedColors = [
+        '#ff6b6b', '#ffb347', '#6bcBef',
+        '#77dd77', '#c8a2ff', '#ffd700',
+        '#ff69b4'
+    ];
+
+    if (!allowedColors.includes(lanternColor)) {
+        throw new Error('မီးပုံးအရောင် မမှန်ပါ။');
+    }
+
+    const { error } = await supabaseClient
+        .from('wishes')
+        .insert({
+            wish_text: text,
+            lantern_color: lanternColor
+        });
+
+    if (error) throw error;
+}
+
+// Read wishes
+async function getWishes() {
+    const { data, error } = await supabaseClient
+        .from('wishes')
+        .select('id, wish_text, lantern_color, created_at')
+        .order('created_at', { ascending: false })
+        .limit(200);
+
+    if (error) throw error;
+    return data;
+}
+
+// Admin login
+async function adminLogin(email, password) {
+    const { data, error } = await supabaseClient.auth
+        .signInWithPassword({ email, password });
+
+    if (error) throw error;
+
+    // Verify that the signed-in user is an authorized admin.
+    const { data: isAdmin, error: adminError } =
+        await supabaseClient.rpc('is_wish_admin');
+
+    if (adminError || !isAdmin) {
+        await supabaseClient.auth.signOut();
+        throw new Error('Admin ခွင့်ပြုချက် မရှိပါ။');
+    }
+
+    return data.user;
+}
+
+// Admin delete
+async function adminDeleteWish(id) {
+    const { data: { user } } =
+        await supabaseClient.auth.getUser();
+
+    if (!user) throw new Error('Admin အရင် login ဝင်ပါ။');
+
+    const { data: isAdmin, error: checkError } =
+        await supabaseClient.rpc('is_wish_admin');
+
+    if (checkError || !isAdmin) {
+        throw new Error('Admin ခွင့်ပြုချက် မရှိပါ။');
+    }
+
+    const { error } = await supabaseClient
+        .from('wishes')
+        .delete()
+        .eq('id', id);
+
+    if (error) throw error;
+}
+
+async function adminLogout() {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+}
 </script>
 </body>
 </html>
