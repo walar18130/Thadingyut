@@ -275,7 +275,7 @@ document.getElementById("wishForm").addEventListener("submit", async (e) => {
 
   const message = input.value.trim();
 
-  const colorMap = {
+  const allowedColors = [
     pink: "#ff69b4",
     orange: "#ffb347",
     blue: "#6bcbef",
@@ -283,7 +283,7 @@ document.getElementById("wishForm").addEventListener("submit", async (e) => {
     purple: "#c8a2ff",
     red: "#ff6b6b",
     gold: "#ffd700"
-  };
+  ];
 
   if (!message) {
     notice.textContent = "ဆုတောင်းစာလေး ရေးပေးပါ။";
