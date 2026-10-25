@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>သီတင်းကျွတ် မီးပုံးလွှတ်ပွဲ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+:root{--gold:#ffe09a}
+body{margin:0;font-family:"Noto Sans Myanmar",sans-serif;background:#070b25;color:white}
+button,textarea{font:inherit}
+button{cursor:pointer}
+.page{display:none;min-height:100vh}
+.page.active{display:block}
+
+/* FULL SCREEN HOME */
+#home{position:relative;min-height:100vh;overflow:hidden;background:radial-gradient(ellipse at 50% 80%,#40214e,transparent 55%),linear-gradient(#070b25,#151638)}
+#sky{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.star{position:absolute;width:2px;height:2px;background:white;border-radius:50%;box-shadow:0 0 8px white;animation:twinkle 2s infinite alternate}
+@keyframes twinkle{to{opacity:.25}}
+#lanternLayer{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.lantern{
+  position:absolute;bottom:-110px;width:48px;height:64px;
+  border:1px solid #fff8cc;border-radius:16px 16px 9px 9px;
+  background:var(--color);box-shadow:0 0 16px var(--glow),0 0 35px var(--glow),inset 0 0 12px #ffffff60;
+  display:flex;align-items:center;justify-content:center;
+  padding:0;pointer-events:auto;animation:floatUp var(--duration) linear forwards;
+}
+.lantern:before{content:"";position:absolute;top:-5px;width:28px;height:7px;border-radius:50%;background:#fff0ad;box-shadow:0 0 10px var(--glow)}
+.lantern:after{content:"";position:absolute;bottom:-10px;width:2px;height:10px;background:var(--glow)}
+.lantern .material-icons-round{color:#fff9d7;font-size:24px;filter:drop-shadow(0 0 5px white)}
+.lantern:hover{filter:brightness(1.4)}
+.pink{--color:linear-gradient(145deg,#ff65d4,#c40082);--glow:#ff36ce}
+.orange{--color:linear-gradient(145deg,#fff0a0,#ff711c);--glow:#ff9a32}
+.blue{--color:linear-gradient(145deg,#83f7ff,#176aff);--glow:#38baff}
+.green{--color:linear-gradient(145deg,#d8ff7b,#18a755);--glow:#69ff72}
+.purple{--color:linear-gradient(145deg,#f0a1ff,#7625ff);--glow:#ca67ff}
+.red{--color:linear-gradient(145deg,#ffb0a0,#ef174f);--glow:#ff466a}
+.gold{--color:linear-gradient(145deg,#fff7a8,#ffae18);--glow:#ffcd4a}
+
+@keyframes floatUp{
+  0%{transform:translate(0,0) rotate(-5deg);opacity:0}
+  8%{opacity:1}
+  30%{transform:translate(28px,-30vh) rotate(6deg)}
+  60%{transform:translate(-22px,-65vh) rotate(-5deg)}
+  100%{transform:translate(24px,-125vh) rotate(8deg);opacity:0}
+}
+.navbar{position:relative;z-index:3;padding:17px 22px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand{color:var(--gold);font-weight:700}
+.navbtn{border:1px solid #ffffff55;color:white;background:#ffffff15;border-radius:9px;padding:9px 12px;font-size:12px}
+.hero{position:relative;z-index:2;text-align:center;padding:5vh 16px 20px;pointer-events:none}
+.eyebrow{font-size:10px;letter-spacing:3px;color:#ffbd8a}
+h1{font-size:clamp(29px,5vw,54px);line-height:1.6;color:var(--gold);margin:12px 0;text-shadow:0 0 25px #ffc65c55}
+.hero p{font-size:12px;line-height:2;color:#deddf5}
+.hint{position:absolute;z-index:2;bottom:22px;left:10px;right:10px;text-align:center;color:#fff;font-size:12px;line-height:2;text-shadow:0 2px 8px #000}
+.hint strong{color:var(--gold)}
+
+/* WISH ENTRY PAGE */
+#entry{background:radial-gradient(ellipse at top,#252553,#080c28 70%);padding-bottom:45px}
+.entry-nav{display:flex;justify-content:space-between;align-items:center;padding:20px;gap:10px}
+.entry-main{max-width:560px;margin:30px auto;padding:0 18px}
+.entry-heading{text-align:center;margin-bottom:25px}
+.entry-heading h2{font-size:26px;color:var(--gold)}
+.entry-heading p{font-size:12px;color:#d0d0e9;line-height:2}
+.card{background:#121737;border:1px solid #ffe09a70;border-radius:20px;padding:25px;box-shadow:0 15px 55px #0005}
+.card h3{margin-top:0;font-size:17px}
+label{display:block;margin:17px 0 9px;font-size:13px;color:#e5e4f7}
+textarea{width:100%;min-height:145px;resize:vertical;background:#090e2b;border:1px solid #565b83;border-radius:12px;padding:14px;color:white;outline:none;line-height:2}
+textarea:focus{border-color:var(--gold)}
+textarea::placeholder{color:#9397b8}
+.colors{display:flex;flex-wrap:wrap;gap:15px;padding:5px 0 20px}
+.color-btn{width:34px;height:34px;border:2px solid #ffffff50;border-radius:50%;background:var(--swatch);box-shadow:0 0 12px var(--swatch);padding:0}
+.color-btn[aria-pressed="true"]{outline:2px solid white;outline-offset:3px}
+.color-btn[aria-pressed="true"]:after{content:"✓";color:white;text-shadow:0 1px 5px #000}
+.submit-btn{width:100%;padding:13px;border:0;border-radius:10px;background:linear-gradient(100deg,#ffe49d,#ffb5a5);font-weight:700;color:#211834}
+#notice{text-align:center;color:var(--gold);font-size:12px;line-height:2}
+.count{text-align:right;color:#a7abca;font-size:11px;margin-top:7px}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;z-index:10;align-items:center;justify-content:center;padding:18px}
+.modal.open{display:flex}
+.backdrop{position:absolute;inset:0;background:#03051be8;backdrop-filter:blur(8px)}
+.modal-card{position:relative;width:min(100%,430px);padding:30px 23px;text-align:center;border-radius:20px;border:1px solid #ffe09a8c;background:#171b40;box-shadow:0 0 45px #ffb93c25}
+.close{position:absolute;top:7px;right:12px;color:white;font-size:28px;background:none;border:0}
+.modal-card h2{color:var(--gold);font-size:20px}
+#wishText{white-space:pre-wrap;overflow-wrap:anywhere;line-height:2.1;font-size:14px}
+footer{text-align:center;color:#aaaed0;font-size:11px;padding:20px}
+@media(max-width:520px){
+ .navbar{padding:14px}.hero{padding-top:7vh}
+ .lantern{width:36px;height:50px}.lantern .material-icons-round{font-size:19px}
+ .entry-main{margin:18px auto}.card{padding:19px 15px}
+}
+@media(prefers-reduced-motion:reduce){.star{animation:none}}
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: FULL SCREEN LANTERNS -->
+<section id="home" class="page active">
+  <div id="sky"></div>
+  <div id="lanternLayer"></div>
+
+  <header class="navbar">
+    <div class="brand">🏮 သီတင်းကျွတ်</div>
+    <button class="navbtn" onclick="showPage('entry')">＋ ဆုတောင်းစာထည့်မယ်</button>
+  </header>
+
+  <div class="hero">
+    <div class="eyebrow">THADINGYUT FESTIVAL</div>
+    <h1>သီတင်းကျွတ်<br>မီးပုံးလွှတ်ပွဲ</h1>
+    <p>မေတ္တာနဲ့ ဆုတောင်းစာလေးတွေကို<br>ကောင်းကင်ဆီ လွှတ်လိုက်ပါ။</p>
+  </div>
+
+  <div class="hint">
+    ✨ ကောင်းကင်အပြည့် မီးပုံးရောင်စုံများ ✨<br>
+    <strong>ဆုတောင်းစာဖတ်ရန် မီးပုံးကို နှိပ်ပါ</strong>
+  </div>
+</section>
+
+<!-- PAGE 2: WISH FORM -->
+<section id="entry" class="page">
+  <header class="entry-nav">
+    <div class="brand">🏮 ဆုတောင်းစာ</div>
+    <button class="navbtn" onclick="showPage('home')">← မီးပုံးများဆီ ပြန်သွားမယ်</button>
+  </header>
+
+  <main class="entry-main">
+    <div class="entry-heading">
+      <div class="eyebrow">MAKE A WISH</div>
+      <h2>ကိုယ့်ဆုတောင်းစာလေး လွှတ်မယ်</h2>
+      <p>ဆုတောင်းစာရေးပြီး မီးပုံးအရောင် ရွေးလိုက်ပါ။</p>
+    </div>
+
+    <div class="card">
+      <h3>🪔 ဆုတောင်းစာအသစ်</h3>
+      <form id="wishForm">
+        <label for="message">ဆုတောင်းစာ</label>
+        <textarea id="message" maxlength="500" required placeholder="မိသားစုအားလုံး ကျန်းမာချမ်းသာကြပါစေ..."></textarea>
+        <div class="count" id="count">0 / 500</div>
+
+        <label>မီးပုံးအရောင် ရွေးပါ</label>
+        <div class="colors" id="colors">
+          <button type="button" class="color-btn" data-color="pink" style="--swatch:#ff45c8" aria-label="ပန်းရောင်" aria-pressed="false"></button>
+          <button type="button" class="color-btn" data-color="orange" style="--swatch:#ff982f" aria-label="လိမ္မော်ရောင်" aria-pressed="true"></button>
+          <button type="button" class="color-btn" data-color="blue" style="--swatch:#35bfff" aria-label="အပြာရောင်" aria-pressed="false"></button>
+          <button type="button" class="color-btn" data-color="green" style="--swatch:#56ee77" aria-label="အစိမ်းရောင်" aria-pressed="false"></button>
+          <button type="button" class="color-btn" data-color="purple" style="--swatch:#bd65ff" aria-label="ခရမ်းရောင်" aria-pressed="false"></button>
+          <button type="button" class="color-btn" data-color="red" style="--swatch:#ff4568" aria-label="အနီရောင်" aria-pressed="false"></button>
+          <button type="button" class="color-btn" data-color="gold" style="--swatch:#ffdb56" aria-label="ရွှေရောင်" aria-pressed="false"></button>
+        </div>
+        <button class="submit-btn" type="submit">🏮 မီးပုံးလွှတ်မယ်</button>
+        <p id="notice" role="status"></p>
+      </form>
+    </div>
+  </main>
+  <footer>အားလုံး လိုရာဆန္ဒပြည့်ဝကြပါစေ။</footer>
+</section>
+
+<!-- WISH POPUP -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="backdrop" onclick="closeWish()"></div>
+  <article class="modal-card" role="dialog" aria-modal="true">
+    <button class="close" onclick="closeWish()" aria-label="ပိတ်ရန်">×</button>
+    <div style="font-size:40px">🏮</div>
+    <div class="eyebrow">A LITTLE WISH FOR YOU</div>
+    <h2>ဆုတောင်းစာလေး</h2>
+    <p id="wishText"></p>
+    <button class="submit-btn" onclick="closeWish()">ပြန်ပိတ်မယ်</button>
+  </article>
+</div>
+
+<script>
+const KEY = "thadingyut_wishes_page_split";
+const colorNames = ["pink","orange","blue","green","purple","red","gold"];
+const layer = document.getElementById("lanternLayer");
+let chosenColor = "orange";
+let nextId = 0;
+
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0,0);
+}
+
+let savedWishes = [];
+function readWishes(){ return savedWishes; }
+function writeWishes(arr){ savedWishes = arr; return true; }
+
+function openWish(wish){
+  document.getElementById("wishText").textContent=wish.message;
+  document.getElementById("modal").classList.add("open");
+  document.getElementById("modal").setAttribute("aria-hidden","false");
+}
+function closeWish(){
+  document.getElementById("modal").classList.remove("open");
+  document.getElementById("modal").setAttribute("aria-hidden","true");
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeWish()});
+
+const samples=[
+  {id:"demo1",message:"မိသားစုအားလုံး ကျန်းမာချမ်းသာပြီး ပျော်ရွှင်ကြပါစေ။",color:"orange",demo:true},
+  {id:"demo2",message:"ချစ်ရသူအားလုံး ဘေးအန္တရာယ်ကင်းပြီး လိုရာဆန္ဒပြည့်ဝကြပါစေ။",color:"pink",demo:true},
+  {id:"demo3",message:"ပညာရေးနဲ့ အလုပ်အကိုင်တွေ အောင်မြင်ကြပါစေ။",color:"blue",demo:true},
+  {id:"demo4",message:"ကမ္ဘာကြီး ငြိမ်းချမ်းပြီး လူတိုင်း စိတ်ချမ်းသာကြပါစေ။",color:"green",demo:true},
+  {id:"demo5",message:"မိဘနှစ်ပါး အသက်ရှည်ကျန်းမာကြပါစေ။",color:"purple",demo:true},
+  {id:"demo6",message:"သူငယ်ချင်းအားလုံး ပျော်ရွှင်အောင်မြင်ကြပါစေ။",color:"red",demo:true},
+  {id:"demo7",message:"အိပ်မက်တွေ အမှန်တကယ် ဖြစ်လာကြပါစေ။",color:"gold",demo:true}
+];
+
+function addLantern(wish, initial=false){
+  const el=document.createElement("button");
+  const id=++nextId;
+  el.type="button";
+  el.className="lantern "+wish.color;
+  el.style.left=(Math.random()*96)+"%";
+  el.style.setProperty("--duration",(14+Math.random()*14)+"s");
+  if(initial) el.style.animationDelay=(-Math.random()*20)+"s";
+  el.setAttribute("aria-label","မီးပုံးကိုနှိပ်ပြီး ဆုတောင်းစာဖတ်ရန်");
+  el.innerHTML='<span class="material-icons-round">light</span>';
+  el.addEventListener("click",()=>openWish(wish));
+  el.addEventListener("animationend",()=>{
+    el.remove();
+    const current=readWishes().find(w=>String(w.id)===String(wish.id));
+    if(current) addLantern(current);
+    else if(wish.demo) addLantern(wish);
+  });
+  el.dataset.lanternId=id;
+  layer.appendChild(el);
+}
+
+async function populateSky(){
+  layer.replaceChildren();
+  let wishes = [];
+  try {
+    wishes = await getWishes();
+    savedWishes = wishes;
+  } catch (error) {
+    console.error("Supabase မှ ဆုတောင်းစာဖတ်မရပါ:", error);
+  }
+  const visibleWishes = wishes.length ? wishes : samples;
+  const total = Math.max(35, Math.min(70, visibleWishes.length * 5));
+  for(let i=0;i<total;i++) addLantern(visibleWishes[i % visibleWishes.length], true);
+}
+
+// Color picker
+document.getElementById("colors").addEventListener("click",e=>{
+  const btn=e.target.closest("[data-color]");
+  if(!btn)return;
+  chosenColor=btn.dataset.color;
+  document.querySelectorAll(".color-btn").forEach(b=>
+    b.setAttribute("aria-pressed",String(b===btn))
+  );
+});
+
+// Character counter
+document.getElementById("message").addEventListener("input",e=>{
+  document.getElementById("count").textContent=e.target.value.length+" / 500";
+});
+
+// Submit a wish to Supabase
+  
+/* Submit a wish to Supabase */
+document.getElementById("wishForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const input = document.getElementById("message");
+  const notice = document.getElementById("notice");
+  const submitButton = e.target.querySelector('button[type="submit"]');
+  const message = input.value.trim();
+  const colorMap = {
+    pink: "#ff69b4", orange: "#ffb347", blue: "#6bcbef",
+    green: "#77dd77", purple: "#c8a2ff", red: "#ff6b6b", gold: "#ffd700"
+  };
+
+  if (!message) { notice.textContent = "ဆုတောင်းစာလေး ရေးပေးပါ။"; return; }
+  if (message.length > 500) { notice.textContent = "စာလုံး ၅၀၀ ထက် မပိုရပါ။"; return; }
+
+  submitButton.disabled = true;
+  notice.textContent = "Database ထဲ သိမ်းနေပါတယ်...";
+  try {
+    const saved = await saveWish(message, colorMap[chosenColor]);
+    savedWishes = [saved, ...savedWishes];
+    notice.textContent = "Database ထဲ သိမ်းပြီးပါပြီ။";
+    input.value = "";
+    document.getElementById("count").textContent = "0 / 500";
+    e.target.reset();
+    document.querySelectorAll(".color-btn").forEach(b =>
+      b.setAttribute("aria-pressed", String(b.dataset.color === "orange"))
+    );
+    chosenColor = "orange";
+    addLantern(saved, true);
+    showPage("home");
+  } catch (error) {
+    console.error("Supabase insert error:", error);
+    const messageText = error?.message || error?.details || String(error);
+    notice.textContent = "Database ထဲ မသိမ်းနိုင်ပါ: " + messageText;
+    alert("Database ထဲ မသိမ်းနိုင်ပါ။\n" + messageText);
+  } finally {
+    submitButton.disabled = false;
+  }
+});
+
+// Background stars
+const sky=document.getElementById("sky");
+for(let i=0;i<120;i++){
+  const s=document.createElement("span");
+  s.className="star";
+  s.style.left=Math.random()*100+"%";
+  s.style.top=Math.random()*100+"%";
+  s.style.animationDelay=Math.random()*3+"s";
+  sky.appendChild(s);
+}
+// Sky is populated after Supabase client setup below.
+</script>
+  <!-- Add before </body> -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = 'https://kthkrdkdqmossoynumxe.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_sVpcnUtzfchZSKIL765XRw_7JdJ2FjL';
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+// Map database hex colors to lantern CSS class names
+const dbColorToName = {
+  "#ff69b4": "pink", "#ffb347": "orange", "#6bcbef": "blue",
+  "#77dd77": "green", "#c8a2ff": "purple", "#ff6b6b": "red", "#ffd700": "gold"
+};
+
+async function saveWish(wishText, lanternColor) {
+  const text = wishText.trim();
+  if (!text || text.length > 500) throw new Error("ဆုတောင်းစာကို 1 မှ 500 characters အတွင်း ဖြည့်ပါ။");
+  if (!lanternColor) throw new Error("မီးပုံးအရောင်ကို ရွေးပေးပါ။");
+
+  const { data, error } = await supabaseClient
+    .from("wishes")
+    .insert({ wish_text: text, lantern_color: lanternColor })
+    .select("id, wish_text, lantern_color, created_at")
+    .single();
+  if (error) throw new Error(`${error.message}${error.details ? " — " + error.details : ""}`);
+  return { id: String(data.id), message: data.wish_text,
+    color: dbColorToName[data.lantern_color] || "orange" };
+}
+
+async function getWishes() {
+  const { data, error } = await supabaseClient
+    .from("wishes")
+    .select("id, wish_text, lantern_color, created_at")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) throw new Error(`${error.message}${error.details ? " — " + error.details : ""}`);
+  return (data || []).map(row => ({ id: String(row.id), message: row.wish_text,
+    color: dbColorToName[row.lantern_color] || "orange" }));
+}
+
+// Admin login
+async function adminLogin(email, password) {
+    const { data, error } = await supabaseClient.auth
+        .signInWithPassword({ email, password });
+
+    if (error) throw error;
+
+    // Verify that the signed-in user is an authorized admin.
+    const { data: isAdmin, error: adminError } =
+        await supabaseClient.rpc('is_wish_admin');
+
+    if (adminError || !isAdmin) {
+        await supabaseClient.auth.signOut();
+        throw new Error('Admin ခွင့်ပြုချက် မရှိပါ။');
+    }
+
+    return data.user;
+}
+
+// Admin delete
+async function adminDeleteWish(id) {
+    const { data: { user } } =
+        await supabaseClient.auth.getUser();
+
+    if (!user) throw new Error('Admin အရင် login ဝင်ပါ။');
+
+    const { data: isAdmin, error: checkError } =
+        await supabaseClient.rpc('is_wish_admin');
+
+    if (checkError || !isAdmin) {
+        throw new Error('Admin ခွင့်ပြုချက် မရှိပါ။');
+    }
+
+    const { error } = await supabaseClient
+        .from('wishes')
+        .delete()
+        .eq('id', id);
+
+    if (error) throw error;
+}
+
+async function adminLogout() {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+}
+
+// Load shared wishes from Supabase on page open
+populateSky();
+</script>
+</body>
+</html>
