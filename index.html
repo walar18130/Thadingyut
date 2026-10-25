@@ -146,7 +146,6 @@ footer{text-align:center;color:#aaaed0;font-size:11px;padding:20px}
         <div class="colors" id="colors">
           <button type="button" class="color-btn" data-color="pink" style="--swatch:#ff45c8" aria-label="ပန်းရောင်" aria-pressed="false"></button>
           <button type="button" class="color-btn" data-color="orange" style="--swatch:#ff982f" aria-label="လိမ္မော်ရောင်" aria-pressed="true"></button>
-
           <button type="button" class="color-btn" data-color="green" style="--swatch:#56ee77" aria-label="အစိမ်းရောင်" aria-pressed="false"></button>
           <button type="button" class="color-btn" data-color="purple" style="--swatch:#bd65ff" aria-label="ခရမ်းရောင်" aria-pressed="false"></button>
           <button type="button" class="color-btn" data-color="red" style="--swatch:#ff4568" aria-label="အနီရောင်" aria-pressed="false"></button>
@@ -175,7 +174,7 @@ footer{text-align:center;color:#aaaed0;font-size:11px;padding:20px}
 
 <script>
 const KEY = "thadingyut_wishes_page_split";
-const colorNames = ["pink","orange","blue","green","purple","red","gold"];
+const colorNames = ["pink","orange","green","purple","red","gold"];
 const layer = document.getElementById("lanternLayer");
 let chosenColor = "orange";
 let nextId = 0;
@@ -263,7 +262,7 @@ document.getElementById("wishForm").addEventListener("submit", async (e) => {
   const submitButton = e.target.querySelector('button[type="submit"]');
   const message = input.value.trim();
   const colorMap = {
-    pink: "#ff69b4", orange: "#ffb347", blue: "#6bcBef",
+    pink: "#ff69b4", orange: "#ffb347",
     green: "#77dd77", purple: "#c8a2ff", red: "#ff6b6b", gold: "#ffd700"
   };
 
@@ -321,7 +320,7 @@ const supabaseClient = window.supabase.createClient(
 
 // Map database hex colors to lantern CSS class names
 const dbColorToName = {
-  "#ff69b4": "pink", "#ffb347": "orange", "#6bcBef": "blue",
+  "#ff69b4": "pink", "#ffb347": "orange",
   "#77dd77": "green", "#c8a2ff": "purple", "#ff6b6b": "red", "#ffd700": "gold"
 };
 
