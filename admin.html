@@ -182,9 +182,31 @@
           loginForm.hidden = false;
           document.getElementById('password').value = '';
           message.textContent = 'Logout လုပ်ပြီးပါပြီ။';
-        } catch (error) {
-          message.textContent = error.message || 'Logout မအောင်မြင်ပါ။';
-        }
+        } 
+} catch (error) {
+  console.error('Admin login error:', error);
+
+  let errorMessage = error.message || 'Login မအောင်မြင်ပါ။';
+
+  if (!navigator.onLine) {
+    errorMessage = 'အင်တာနက်ချိတ်ဆက်မှု မရှိပါ။ Internet ကို စစ်ဆေးပါ။';
+  } else if (
+    error instanceof TypeError ||
+    /failed to fetch|load failed|networkerror/i.test(errorMessage)
+  ) {
+    errorMessage =
+      'Supabase ကို ချိတ်ဆက်မရပါ။ Supabase URL၊ Publishable Key၊ API နဲ့ Internet ကို စစ်ဆေးပါ။';
+  } else if (/invalid login credentials/i.test(errorMessage)) {
+    errorMessage =
+      'Email သို့မဟုတ် Password မှားနေပါတယ်။ Admin account ကို ပြန်စစ်ပါ။';
+  } else if (/email not confirmed/i.test(errorMessage)) {
+    errorMessage =
+      'Admin email ကို အတည်ပြုရန် လိုအပ်နေပါတယ်။ Supabase Authentication ကို စစ်ပါ။';
+  }
+
+  message.textContent = errorMessage;
+}
+
       });
   </script>
 </body>
