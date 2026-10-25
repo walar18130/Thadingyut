@@ -1,242 +1,611 @@
-
 <!DOCTYPE html>
 <html lang="my">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wish Admin</title>
+  <meta name="theme-color" content="#fff8ef">
+  <title>Thadingyut Wish Admin</title>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      max-width: 650px;
-      margin: 30px auto;
-      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Arial, sans-serif;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 20px 16px;
       background: #fff8ef;
       color: #333;
+      line-height: 1.6;
     }
-    input, button {
-      box-sizing: border-box;
+
+    h1 {
+      color: #8b3d55;
+      text-align: center;
+      font-size: 27px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 24px;
+    }
+
+    .panel {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(80, 40, 40, 0.08);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 14px 0 6px;
+    }
+
+    input {
+      display: block;
       width: 100%;
-      padding: 12px;
-      margin: 7px 0;
-      border-radius: 8px;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      font-size: 16px;
+      background: white;
     }
-    input { border: 1px solid #ccc; }
+
+    input:focus {
+      outline: 2px solid #d9a0b0;
+      border-color: #8b3d55;
+    }
+
     button {
-      border: 0;
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 9px;
+      margin-top: 12px;
       background: #8b3d55;
       color: white;
+      font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
     }
-    .wish {
-      background: white;
-      border-radius: 10px;
-      padding: 12px;
-      margin: 12px 0;
-      overflow-wrap: anywhere;
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
-    [hidden] { display: none !important; }
+
+    .secondary {
+      background: #686868;
+    }
+
+    .delete-button {
+      background: #b42318;
+    }
+
+    #message {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      padding: 10px 0;
+      font-size: 14px;
+    }
+
+    .wish {
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+      background: #fffdfb;
+    }
+
+    .wish-text {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      margin: 0 0 8px;
+    }
+
+    .wish-date {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777;
+      padding: 24px 8px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 14px 10px;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <h1>Wish Admin</h1>
+  <h1>မီးပုံးဆုတောင်း Admin</h1>
+  <p class="subtitle">ဆုတောင်းစာများကို စီမံခန့်ခွဲရန်</p>
 
-  <form id="loginForm">
-    <label for="email">Admin Email</label>
-    <input id="email" type="email" required autocomplete="username">
+  <section id="loginPanel" class="panel">
+    <h2>Admin Login</h2>
 
-    <label for="password">Password</label>
-    <input id="password" type="password"
-           required autocomplete="current-password">
+    <form id="loginForm">
+      <label for="email">Admin Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autocomplete="username"
+        placeholder="Admin email ထည့်ပါ"
+        required
+      >
 
-    <button type="submit">Login</button>
-  </form>
+      <label for="password">Password</label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Password ထည့်ပါ"
+        required
+      >
 
-  <p id="message" role="status"></p>
-
-  <section id="dashboard" hidden>
-    <button id="refreshButton">Refresh Wishes</button>
-    <button id="logoutButton">Logout</button>
-    <div id="wishList"></div>
+      <button id="loginButton" type="submit">Login ဝင်မည်</button>
+    </form>
   </section>
 
+  <p id="message" role="status" aria-live="polite"></p>
+
+  <section id="dashboard" class="panel" hidden>
+    <h2>ဆုတောင်းစာများ</h2>
+
+    <button id="refreshButton" type="button">
+      Refresh Wishes
+    </button>
+
+    <button id="logoutButton" type="button" class="secondary">
+      Logout
+    </button>
+
+    <div id="wishList">
+      <p class="empty">ဆုတောင်းစာများကို ဖတ်နေပါတယ်...</p>
+    </div>
+  </section>
+
+  <!-- Supabase JavaScript library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-  const SUPABASE_URL = 'https://kthkrdkdqmossoynumxe.supabase.co'
-  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_sVpcnUtzfchZSKIL765XRw_7JdJ2FjL';
-
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
-
-  async function adminLogin(email, password) {
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) throw error;
-  }
-
-  async function getWishes() {
-    const { data, error } = await supabaseClient
-      .from('wishes')
-      .select('id, wish_text, created_at')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data;
-  }
-
-  async function adminDeleteWish(id) {
-    const { error } = await supabaseClient
-      .from('wishes')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  }
-
-  async function adminLogout() {
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) throw error;
-  }
-</script>
 
   <script>
-    // If you place the Supabase client and helper functions
-    // directly in this file, remove the script above and
-    // put their code before this script instead.
+    'use strict';
 
+    // ==========================================
+    // 1. SUPABASE CONFIGURATION
+    // ==========================================
+
+    const SUPABASE_URL =
+      'https://kthkrdkdqmossoynumxe.supabase.co';
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      'sb_publishable_sVpcnUtzfchZSKIL765XRw_7JdJ2FjL';
+
+    // ==========================================
+    // 2. ELEMENTS
+    // ==========================================
+
+    const loginPanel = document.getElementById('loginPanel');
     const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
     const dashboard = document.getElementById('dashboard');
     const message = document.getElementById('message');
     const wishList = document.getElementById('wishList');
 
+    const refreshButton = document.getElementById('refreshButton');
+    const logoutButton = document.getElementById('logoutButton');
 
+    let supabaseClient = null;
+    let isLoading = false;
 
-loginForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
+    // ==========================================
+    // 3. INITIALIZE SUPABASE
+    // ==========================================
 
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
+    function initializeSupabase() {
+      if (!window.supabase || !window.supabase.createClient) {
+        throw new Error(
+          'Supabase library မတင်နိုင်ပါ။ Internet connection ကို စစ်ပါ။'
+        );
+      }
 
-  // Submit မလုပ်ခင် ရိုက်ထားတဲ့အချက်အလက်ကို သိမ်းထားမယ်
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
+      if (
+        !SUPABASE_URL.startsWith('https://') ||
+        !SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')
+      ) {
+        throw new Error(
+          'Supabase URL သို့မဟုတ် Publishable Key ကို စစ်ဆေးပါ။'
+        );
+      }
 
-  message.textContent = 'Login စစ်ဆေးနေပါတယ်။';
-
-  try {
-    await adminLogin(email, password);
-
-    // Login အောင်မြင်မှသာ form ကို ဖျောက်မယ်
-    loginForm.hidden = true;
-    dashboard.hidden = false;
-
-    try {
-      await loadAdminWishes();
-      message.textContent = 'Admin login အောင်မြင်ပါပြီ။';
-    } catch (error) {
-      console.error('Wish loading error:', error);
-      message.textContent =
-        'Login အောင်မြင်ပါတယ်၊ ဒါပေမဲ့ Wish List မဖတ်နိုင်ပါ။ ' +
-        (error.message || '');
+      supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        }
+      );
     }
-  } catch (error) {
-    console.error('Admin login error:', error);
 
-    // Login မအောင်မြင်ရင် Email/Password ကို မရှင်းပါ
-    loginForm.hidden = false;
-    dashboard.hidden = true;
-    emailInput.value = email;
-    passwordInput.value = password;
+    // ==========================================
+    // 4. MESSAGE HELPERS
+    // ==========================================
 
-    message.textContent =
-      'Login မအောင်မြင်ပါ: ' +
-      (error.message || 'Network သို့မဟုတ် Supabase setting ကို စစ်ပါ။');
-  }
-});
+    function showMessage(text) {
+      message.textContent = text;
+    }
 
+    function getErrorMessage(error) {
+      const text = error?.message || String(error);
 
-    
+      if (/failed to fetch|load failed|networkerror/i.test(text)) {
+        return 'Supabase ချိတ်ဆက်မရပါ။ Internet၊ URL နဲ့ API ကို စစ်ပါ။';
+      }
+
+      if (/invalid login credentials/i.test(text)) {
+        return 'Email သို့မဟုတ် Password မှားနေပါတယ်။';
+      }
+
+      if (/email not confirmed/i.test(text)) {
+        return 'Admin email ကို အတည်ပြုရန် လိုအပ်ပါတယ်။';
+      }
+
+      if (/row-level security|permission denied|not allowed/i.test(text)) {
+        return 'ခွင့်ပြုချက်မရှိပါ။ Supabase RLS policies ကို စစ်ပါ။';
+      }
+
+      return text;
+    }
+
+    // ==========================================
+    // 5. ADMIN LOGIN
+    // ==========================================
+
+    async function adminLogin(email, password) {
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email: email.trim(),
+          password: password
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data.session || !data.user) {
+        throw new Error('Login session မရရှိပါ။ ထပ်မံစမ်းကြည့်ပါ။');
+      }
+
+      return data;
+    }
+
+    loginForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      if (isLoading) return;
+
+      // Values ကို ယာယီ variable ထဲတွင်သာ သိမ်းထားမည်။
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      isLoading = true;
+      loginButton.disabled = true;
+      loginButton.textContent = 'Login စစ်ဆေးနေပါတယ်...';
+
+      showMessage('Supabase ကို ချိတ်ဆက်နေပါတယ်...');
+
+      try {
+        if (!supabaseClient) {
+          initializeSupabase();
+        }
+
+        await adminLogin(email, password);
+
+        // Login အောင်မြင်မှ form ကို ဖျောက်ပါ။
+        loginPanel.hidden = true;
+        dashboard.hidden = false;
+
+        // Login အောင်မြင်ပြီးနောက် password ကို ရှင်းပါ။
+        passwordInput.value = '';
+
+        showMessage('Login အောင်မြင်ပါပြီ။ Wish List ကို ဖတ်နေပါတယ်...');
+
+        try {
+          await loadAdminWishes();
+          showMessage('Login အောင်မြင်ပါပြီ။');
+        } catch (error) {
+          console.error('Wish loading error:', error);
+
+          showMessage(
+            'Login အောင်မြင်ပါတယ်။ Wish List ဖတ်မရပါ။\n' +
+            getErrorMessage(error)
+          );
+        }
+
+      } catch (error) {
+        console.error('Admin login error:', error);
+
+        // Login မအောင်မြင်လျှင် form ကို ဆက်ပြပါ။
+        loginPanel.hidden = false;
+        dashboard.hidden = true;
+
+        // Email ကို ထိန်းထားမည်။
+        emailInput.value = email;
+
+        // Password ကို localStorage ထဲမသိမ်းပါ။
+        // Login error ဖြစ်ရင် ပြန်ထည့်ရိုက်နိုင်ရန် ရှင်းထားမည်။
+        passwordInput.value = '';
+        passwordInput.focus();
+
+        showMessage('Login မအောင်မြင်ပါ။ ' + getErrorMessage(error));
+      } finally {
+        isLoading = false;
+        loginButton.disabled = false;
+        loginButton.textContent = 'Login ဝင်မည်';
+      }
+    });
+
+    // ==========================================
+    // 6. LOAD WISHES FROM DATABASE
+    // ==========================================
+
+    async function getWishes() {
+      const { data, error } = await supabaseClient
+        .from('wishes')
+        .select('id, wish_text, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      return data || [];
+    }
 
     async function loadAdminWishes() {
-      const wishes = await getWishes();
       wishList.replaceChildren();
 
-      wishes.forEach((wish) => {
+      const loading = document.createElement('p');
+      loading.className = 'empty';
+      loading.textContent = 'ဆုတောင်းစာများကို ဖတ်နေပါတယ်...';
+      wishList.appendChild(loading);
+
+      const wishes = await getWishes();
+
+      wishList.replaceChildren();
+
+      if (wishes.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'empty';
+        empty.textContent = 'Database ထဲမှာ ဆုတောင်းစာ မရှိသေးပါ။';
+        wishList.appendChild(empty);
+        return;
+      }
+
+      wishes.forEach(function (wish) {
         const card = document.createElement('article');
         card.className = 'wish';
 
         const text = document.createElement('p');
-        text.textContent = wish.wish_text;
+        text.className = 'wish-text';
 
-        const remove = document.createElement('button');
-        remove.textContent = 'Delete Wish';
+        // textContent သုံးထားသဖြင့် wish ကို HTML အဖြစ် မလုပ်ဆောင်ပါ။
+        text.textContent = wish.wish_text || '(စာမရှိပါ)';
 
-        remove.addEventListener('click', async () => {
-          if (!confirm('ဒီ Wish ကို ဖျက်မှာ သေချာပါသလား။')) return;
+        const date = document.createElement('p');
+        date.className = 'wish-date';
+
+        date.textContent = wish.created_at
+          ? new Date(wish.created_at).toLocaleString()
+          : '';
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'delete-button';
+        removeButton.textContent = 'Delete Wish';
+
+        removeButton.addEventListener('click', async function () {
+          const confirmed = confirm(
+            'ဒီဆုတောင်းစာကို Database ထဲကနေ အပြီးဖျက်မှာ သေချာပါသလား။'
+          );
+
+          if (!confirmed) return;
+
+          removeButton.disabled = true;
+          removeButton.textContent = 'ဖျက်နေပါတယ်...';
 
           try {
             await adminDeleteWish(wish.id);
+
+            showMessage('ဆုတောင်းစာကို ဖျက်ပြီးပါပြီ။');
             await loadAdminWishes();
-            message.textContent = 'Wish ဖျက်ပြီးပါပြီ။';
+
           } catch (error) {
-            message.textContent = error.message || 'ဖျက်မရပါ။';
+            console.error('Delete wish error:', error);
+
+            showMessage(
+              'ဆုတောင်းစာ ဖျက်မရပါ။ ' + getErrorMessage(error)
+            );
+
+            removeButton.disabled = false;
+            removeButton.textContent = 'Delete Wish';
           }
         });
 
-        card.append(text, remove);
+        card.append(text, date, removeButton);
         wishList.appendChild(card);
       });
     }
 
-    document.getElementById('refreshButton')
-      .addEventListener('click', async () => {
-        try {
-          await loadAdminWishes();
-          message.textContent = 'Wish list ပြန်ဖတ်ပြီးပါပြီ။';
-        } catch (error) {
-          message.textContent = error.message || 'ပြန်ဖတ်မရပါ။';
-        }
-      });
+    // ==========================================
+    // 7. DELETE WISH
+    // ==========================================
 
-    document.getElementById('logoutButton')
-      .addEventListener('click', async () => {
-        try {
-          await adminLogout();
+    async function adminDeleteWish(id) {
+      const { data: sessionData, error: sessionError } =
+        await supabaseClient.auth.getSession();
+
+      if (sessionError) throw sessionError;
+
+      if (!sessionData.session) {
+        throw new Error('Login session မရှိတော့ပါ။ ပြန် Login ဝင်ပါ။');
+      }
+
+      const { data, error } = await supabaseClient
+        .from('wishes')
+        .delete()
+        .eq('id', id)
+        .select('id');
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error(
+          'ဖျက်ခွင့်မရှိပါ သို့မဟုတ် Wish ကို မတွေ့ပါ။ Supabase DELETE policy ကို စစ်ပါ။'
+        );
+      }
+    }
+
+    // ==========================================
+    // 8. REFRESH WISHES
+    // ==========================================
+
+    refreshButton.addEventListener('click', async function () {
+      refreshButton.disabled = true;
+
+      try {
+        await loadAdminWishes();
+        showMessage('Wish List ကို ပြန်ဖတ်ပြီးပါပြီ။');
+
+      } catch (error) {
+        console.error('Refresh error:', error);
+
+        showMessage(
+          'Wish List ပြန်ဖတ်မရပါ။ ' + getErrorMessage(error)
+        );
+
+      } finally {
+        refreshButton.disabled = false;
+      }
+    });
+
+    // ==========================================
+    // 9. LOGOUT
+    // ==========================================
+
+    logoutButton.addEventListener('click', async function () {
+      logoutButton.disabled = true;
+
+      try {
+        const { error } = await supabaseClient.auth.signOut();
+
+        if (error) throw error;
+
+        dashboard.hidden = true;
+        loginPanel.hidden = false;
+
+        loginForm.reset();
+        wishList.replaceChildren();
+
+        showMessage('Logout လုပ်ပြီးပါပြီ။');
+
+      } catch (error) {
+        console.error('Logout error:', error);
+
+        showMessage(
+          'Logout မအောင်မြင်ပါ။ ' + getErrorMessage(error)
+        );
+
+      } finally {
+        logoutButton.disabled = false;
+      }
+    });
+
+    // ==========================================
+    // 10. INITIAL PAGE SETUP
+    // ==========================================
+
+    async function initializePage() {
+      try {
+        initializeSupabase();
+
+        const { data, error } =
+          await supabaseClient.auth.getSession();
+
+        if (error) throw error;
+
+        if (data.session) {
+          loginPanel.hidden = true;
+          dashboard.hidden = false;
+
+          try {
+            await loadAdminWishes();
+            showMessage('လက်ရှိ session နဲ့ Login ဝင်ထားပါတယ်။');
+
+          } catch (error) {
+            console.error('Initial wish load error:', error);
+
+            showMessage(
+              'Session ရှိပါတယ်၊ ဒါပေမဲ့ Wish List ဖတ်မရပါ။ ' +
+              getErrorMessage(error)
+            );
+          }
+        } else {
+          loginPanel.hidden = false;
           dashboard.hidden = true;
-          loginForm.hidden = false;
-          document.getElementById('password').value = '';
-          message.textContent = 'Logout လုပ်ပြီးပါပြီ။';
-        } 
-} catch (error) {
-  console.error('Admin login error:', error);
+        }
 
-  let errorMessage = error.message || 'Login မအောင်မြင်ပါ။';
+      } catch (error) {
+        console.error('Initialization error:', error);
 
-  if (!navigator.onLine) {
-    errorMessage = 'အင်တာနက်ချိတ်ဆက်မှု မရှိပါ။ Internet ကို စစ်ဆေးပါ။';
-  } else if (
-    error instanceof TypeError ||
-    /failed to fetch|load failed|networkerror/i.test(errorMessage)
-  ) {
-    errorMessage =
-      'Supabase ကို ချိတ်ဆက်မရပါ။ Supabase URL၊ Publishable Key၊ API နဲ့ Internet ကို စစ်ဆေးပါ။';
-  } else if (/invalid login credentials/i.test(errorMessage)) {
-    errorMessage =
-      'Email သို့မဟုတ် Password မှားနေပါတယ်။ Admin account ကို ပြန်စစ်ပါ။';
-  } else if (/email not confirmed/i.test(errorMessage)) {
-    errorMessage =
-      'Admin email ကို အတည်ပြုရန် လိုအပ်နေပါတယ်။ Supabase Authentication ကို စစ်ပါ။';
-  }
+        loginPanel.hidden = false;
+        dashboard.hidden = true;
 
-  message.textContent = errorMessage;
-}
+        showMessage(
+          'စတင်ဖွင့်ရာတွင် အမှားဖြစ်နေပါတယ်။ ' +
+          getErrorMessage(error)
+        );
+      }
+    }
 
-      });
+    initializePage();
   </script>
 </body>
 </html>
+
