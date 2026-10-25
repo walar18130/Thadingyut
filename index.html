@@ -262,41 +262,74 @@ document.getElementById("message").addEventListener("input",e=>{
 });
 
 // Submit a wish to Supabase
-document.getElementById("wishForm").addEventListener("submit", async e=>{
+  
+/* Submit a wish to Supabase */
+document.getElementById("wishForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const input = document.getElementById("message");
-  const message = input.value.trim();
-  const notice = document.getElementById("notice");
-  const submitButton = e.target.querySelector(".submit-btn");
 
-  if(!message){
+  const input = document.getElementById("message");
+  const notice = document.getElementById("notice");
+  const submitButton = e.target.querySelector(
+    'button[type="submit"]'
+  );
+
+  const message = input.value.trim();
+
+  const colorMap = {
+    pink: "#ff69b4",
+    orange: "#ffb347",
+    blue: "#6bcbef",
+    green: "#77dd77",
+    purple: "#c8a2ff",
+    red: "#ff6b6b",
+    gold: "#ffd700"
+  };
+
+  if (!message) {
     notice.textContent = "ဆုတောင်းစာလေး ရေးပေးပါ။";
     return;
   }
 
+  if (message.length > 500) {
+    notice.textContent = "စာလုံး ၅၀၀ ထက် မပိုရပါ။";
+    return;
+  }
+
   submitButton.disabled = true;
-  notice.textContent = "ဆုတောင်းစာ သိမ်းဆည်းနေပါတယ်...";
+  notice.textContent = "Database ထဲ သိမ်းနေပါတယ်...";
+
   try {
-    const wish = await saveWish(message, chosenColor);
-    savedWishes.unshift(wish);
+    await saveWish(message, colorMap[chosenColor]);
+
+    notice.textContent =
+      "ဆုတောင်းစာကို Database ထဲ သိမ်းပြီးပါပြီ။";
+
     input.value = "";
     document.getElementById("count").textContent = "0 / 500";
-    e.target.reset();
-    chosenColor = "orange";
-    document.querySelectorAll(".color-btn").forEach(b =>
-      b.setAttribute("aria-pressed", String(b.dataset.color === "orange"))
-    );
-    notice.textContent = "မီးပုံးလွှတ်ပြီးပါပြီ။";
+
+    const wish = {
+      id: "new-" + Date.now(),
+      message: message,
+      color: chosenColor
+    };
+
     addLantern(wish, true);
     showPage("home");
-  } catch(error) {
-    console.error(error);
-    notice.textContent = "တင်မရပါ။ Supabase table / permission ကို စစ်ဆေးပါ။";
-    alert("ဆုတောင်းစာ မသိမ်းနိုင်ပါ။ " + (error.message || ""));
+
+  } catch (error) {
+    console.error("Supabase insert error:", error);
+
+    notice.textContent =
+      "သိမ်းမရပါ။ " + (error.message || "အမှားတစ်ခု ဖြစ်နေပါတယ်။");
+
+    alert("Database ထဲ မသိမ်းနိုင်ပါ။\n" +
+      (error.message || "အမှားတစ်ခု ဖြစ်နေပါတယ်။"));
+
   } finally {
     submitButton.disabled = false;
   }
 });
+
 
 // Background stars
 const sky=document.getElementById("sky");
