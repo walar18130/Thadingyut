@@ -263,7 +263,7 @@ document.getElementById("wishForm").addEventListener("submit", async (e) => {
   const submitButton = e.target.querySelector('button[type="submit"]');
   const message = input.value.trim();
   const colorMap = {
-    pink: "#ff69b4", orange: "#ffb347", blue: "#6bcbef",
+    pink: "#ff69b4", orange: "#ffb347", blue: "#6bcBef",
     green: "#77dd77", purple: "#c8a2ff", red: "#ff6b6b", gold: "#ffd700"
   };
 
@@ -321,7 +321,7 @@ const supabaseClient = window.supabase.createClient(
 
 // Map database hex colors to lantern CSS class names
 const dbColorToName = {
-  "#ff69b4": "pink", "#ffb347": "orange", "#6bcbef": "blue",
+  "#ff69b4": "pink", "#ffb347": "orange", "#6bcBef": "blue",
   "#77dd77": "green", "#c8a2ff": "purple", "#ff6b6b": "red", "#ffd700": "gold"
 };
 
