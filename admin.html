@@ -114,24 +114,41 @@
     const message = document.getElementById('message');
     const wishList = document.getElementById('wishList');
 
-    loginForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      message.textContent = 'Login စစ်ဆေးနေပါတယ်။';
 
-      try {
-        await adminLogin(
-          document.getElementById('email').value,
-          document.getElementById('password').value
-        );
+loginForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  message.textContent = 'Login စစ်ဆေးနေပါတယ်။';
 
-        loginForm.hidden = true;
-        dashboard.hidden = false;
-        await loadAdminWishes();
-        message.textContent = 'Admin login အောင်မြင်ပါပြီ။';
-      } catch (error) {
-        message.textContent = error.message || 'Login မအောင်မြင်ပါ။';
-      }
-    });
+  try {
+    if (!window.supabase) {
+      throw new Error(
+        'Supabase library မတင်နိုင်ပါ။ Internet/CDN ကို စစ်ပါ။'
+      );
+    }
+
+    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+      throw new Error('Supabase URL သို့မဟုတ် Publishable Key မရှိပါ။');
+    }
+
+    await adminLogin(
+      document.getElementById('email').value.trim(),
+      document.getElementById('password').value
+    );
+
+    loginForm.hidden = true;
+    dashboard.hidden = false;
+    await loadAdminWishes();
+    message.textContent = 'Login အောင်မြင်ပါပြီ။';
+  } catch (error) {
+    console.error('Login error:', error);
+
+    message.textContent =
+      error?.message ||
+      'Login မအောင်မြင်ပါ။ Network နဲ့ Supabase settings ကို စစ်ပါ။';
+  }
+});
+
+    
 
     async function loadAdminWishes() {
       const wishes = await getWishes();
