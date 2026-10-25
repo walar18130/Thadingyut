@@ -115,38 +115,50 @@
     const wishList = document.getElementById('wishList');
 
 
+
 loginForm.addEventListener('submit', async (event) => {
   event.preventDefault();
+
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+
+  // Submit မလုပ်ခင် ရိုက်ထားတဲ့အချက်အလက်ကို သိမ်းထားမယ်
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
   message.textContent = 'Login စစ်ဆေးနေပါတယ်။';
 
   try {
-    if (!window.supabase) {
-      throw new Error(
-        'Supabase library မတင်နိုင်ပါ။ Internet/CDN ကို စစ်ပါ။'
-      );
-    }
+    await adminLogin(email, password);
 
-    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-      throw new Error('Supabase URL သို့မဟုတ် Publishable Key မရှိပါ။');
-    }
-
-    await adminLogin(
-      document.getElementById('email').value.trim(),
-      document.getElementById('password').value
-    );
-
+    // Login အောင်မြင်မှသာ form ကို ဖျောက်မယ်
     loginForm.hidden = true;
     dashboard.hidden = false;
-    await loadAdminWishes();
-    message.textContent = 'Login အောင်မြင်ပါပြီ။';
+
+    try {
+      await loadAdminWishes();
+      message.textContent = 'Admin login အောင်မြင်ပါပြီ။';
+    } catch (error) {
+      console.error('Wish loading error:', error);
+      message.textContent =
+        'Login အောင်မြင်ပါတယ်၊ ဒါပေမဲ့ Wish List မဖတ်နိုင်ပါ။ ' +
+        (error.message || '');
+    }
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Admin login error:', error);
+
+    // Login မအောင်မြင်ရင် Email/Password ကို မရှင်းပါ
+    loginForm.hidden = false;
+    dashboard.hidden = true;
+    emailInput.value = email;
+    passwordInput.value = password;
 
     message.textContent =
-      error?.message ||
-      'Login မအောင်မြင်ပါ။ Network နဲ့ Supabase settings ကို စစ်ပါ။';
+      'Login မအောင်မြင်ပါ: ' +
+      (error.message || 'Network သို့မဟုတ် Supabase setting ကို စစ်ပါ။');
   }
 });
+
 
     
 
