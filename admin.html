@@ -61,7 +61,49 @@
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://kthkrdkdqmossoynumxe.supabase.com"></script>
+  <script>
+  const SUPABASE_URL = 'https://kthkrdkdqmossoynumxe.supabase.com'
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_sVpcnUtzfchZSKIL765XRw_7JdJ2FjL';
+
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  async function adminLogin(email, password) {
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+  }
+
+  async function getWishes() {
+    const { data, error } = await supabaseClient
+      .from('wishes')
+      .select('id, wish_text, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  }
+
+  async function adminDeleteWish(id) {
+    const { error } = await supabaseClient
+      .from('wishes')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  async function adminLogout() {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+  }
+</script>
+
   <script>
     // If you place the Supabase client and helper functions
     // directly in this file, remove the script above and
