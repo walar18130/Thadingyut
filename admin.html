@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wish Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 650px;
+      margin: 30px auto;
+      padding: 16px;
+      background: #fff8ef;
+      color: #333;
+    }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0;
+      border-radius: 8px;
+    }
+    input { border: 1px solid #ccc; }
+    button {
+      border: 0;
+      background: #8b3d55;
+      color: white;
+      cursor: pointer;
+    }
+    .wish {
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      margin: 12px 0;
+      overflow-wrap: anywhere;
+    }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <h1>Wish Admin</h1>
+
+  <form id="loginForm">
+    <label for="email">Admin Email</label>
+    <input id="email" type="email" required autocomplete="username">
+
+    <label for="password">Password</label>
+    <input id="password" type="password"
+           required autocomplete="current-password">
+
+    <button type="submit">Login</button>
+  </form>
+
+  <p id="message" role="status"></p>
+
+  <section id="dashboard" hidden>
+    <button id="refreshButton">Refresh Wishes</button>
+    <button id="logoutButton">Logout</button>
+    <div id="wishList"></div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="YOUR_CONFIGURED_SUPABASE_SCRIPT_URL"></script>
+  <script>
+    // If you place the Supabase client and helper functions
+    // directly in this file, remove the script above and
+    // put their code before this script instead.
+
+    const loginForm = document.getElementById('loginForm');
+    const dashboard = document.getElementById('dashboard');
+    const message = document.getElementById('message');
+    const wishList = document.getElementById('wishList');
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      message.textContent = 'Login စစ်ဆေးနေပါတယ်။';
+
+      try {
+        await adminLogin(
+          document.getElementById('email').value,
+          document.getElementById('password').value
+        );
+
+        loginForm.hidden = true;
+        dashboard.hidden = false;
+        await loadAdminWishes();
+        message.textContent = 'Admin login အောင်မြင်ပါပြီ။';
+      } catch (error) {
+        message.textContent = error.message || 'Login မအောင်မြင်ပါ။';
+      }
+    });
+
+    async function loadAdminWishes() {
+      const wishes = await getWishes();
+      wishList.replaceChildren();
+
+      wishes.forEach((wish) => {
+        const card = document.createElement('article');
+        card.className = 'wish';
+
+        const text = document.createElement('p');
+        text.textContent = wish.wish_text;
+
+        const remove = document.createElement('button');
+        remove.textContent = 'Delete Wish';
+
+        remove.addEventListener('click', async () => {
+          if (!confirm('ဒီ Wish ကို ဖျက်မှာ သေချာပါသလား။')) return;
+
+          try {
+            await adminDeleteWish(wish.id);
+            await loadAdminWishes();
+            message.textContent = 'Wish ဖျက်ပြီးပါပြီ။';
+          } catch (error) {
+            message.textContent = error.message || 'ဖျက်မရပါ။';
+          }
+        });
+
+        card.append(text, remove);
+        wishList.appendChild(card);
+      });
+    }
+
+    document.getElementById('refreshButton')
+      .addEventListener('click', async () => {
+        try {
+          await loadAdminWishes();
+          message.textContent = 'Wish list ပြန်ဖတ်ပြီးပါပြီ။';
+        } catch (error) {
+          message.textContent = error.message || 'ပြန်ဖတ်မရပါ။';
+        }
+      });
+
+    document.getElementById('logoutButton')
+      .addEventListener('click', async () => {
+        try {
+          await adminLogout();
+          dashboard.hidden = true;
+          loginForm.hidden = false;
+          document.getElementById('password').value = '';
+          message.textContent = 'Logout လုပ်ပြီးပါပြီ။';
+        } catch (error) {
+          message.textContent = error.message || 'Logout မအောင်မြင်ပါ။';
+        }
+      });
+  </script>
+</body>
+</html>
